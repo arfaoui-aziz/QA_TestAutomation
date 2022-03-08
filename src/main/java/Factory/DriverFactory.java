@@ -1,7 +1,9 @@
 package Factory;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class DriverFactory {
 
@@ -9,13 +11,39 @@ public class DriverFactory {
 
     public static ThreadLocal<WebDriver> tlDriver = new ThreadLocal<>();
 
-    public void initDriver(String browser){
+    /**
+     * This method is used to initialize the thradlocal driver on the basis of given
+     * browser
+     *
+     * @param browser
+     * @return this will return tldriver.
+     */
+    public WebDriver initDriver(String browser){
+
         System.out.println("Browser value is: " + browser);
 
-        if(browser.equals("chrome")){
-            //install WebDriverManager
-        //WebDriverManager.chromedriver().setup();
-            tlDriver.set(new ChromeDriver());
+        switch (browser){
+            case "firefox":
+                WebDriverManager.firefoxdriver().setup();
+                tlDriver.set(new FirefoxDriver());
+                break;
+            case "chrome":
+            default:
+                WebDriverManager.chromedriver().setup();
+                tlDriver.set(new ChromeDriver());
         }
+        getDriver().manage().deleteAllCookies();
+        getDriver().manage().window().maximize();
+
+        return getDriver();
+    }
+
+    /**
+     * this is used to get the driver with ThreadLocal
+     *
+     * @return WebDriver
+     */
+    public static WebDriver getDriver(){
+        return tlDriver.get();
     }
 }
